@@ -1,7 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:pusher_client_socket/pusher_client_socket.dart';
 import 'package:reverb_websocket_flutter/pusher_service.dart';
+import 'package:reverb_websocket_flutter/reverb_service.dart';
 
 class UpdateScreen extends StatefulWidget {
   const UpdateScreen({super.key});
@@ -12,20 +16,43 @@ class UpdateScreen extends StatefulWidget {
 
 class _UpdateScreenState extends State<UpdateScreen> {
   final pusher = PusherService();
-  String data = "No data";
+  String sdata = "No data";
   late StreamSubscription eventSub;
+
+  final reverb = ReverbService();
+  late Channel channel;
 
   @override
   void initState() {
     super.initState();
     // pusher.subscribeToChannel("");
-    eventSub = pusher
-        .subscribeAndBindToEvent("test-channel", 'TestEvent')
-        .listen((message) {
-      setState(() {
-        data = message['message'];
+    // eventSub = pusher
+    //     .subscribeAndBindToEvent("test-channel", 'TestEvent')
+    //     .listen((message) {
+    //   setState(() {
+    //     data = message['message'];
+    //   });
+    // });
+    reverb.initChannel();
+    // reverb.pusherClient.subscribe("test-channel").bind("TestEvent", (data) {
+    //   print(data);
+    // });
+    // reverb.pusherClient.connect();
+    reverb.pusherClient.onConnectionEstablished((data) {
+      // print("Connection established - socket-id: ${pusherClient.socketId}");
+      print("Connection established - data: $data");
+      channel = reverb.pusherClient.channel("test-channel");
+      channel.subscribe();
+      channel.bind("TestEvent", (Map<String, dynamic> e) {
+        log(e.toString());
+        // var jsonData = jsonDecode(e);
+        setState(() {
+          sdata = e['message'];
+        });
       });
     });
+
+    reverb.connect();
   }
 
   @override
@@ -42,7 +69,7 @@ class _UpdateScreenState extends State<UpdateScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Text(data),
+            Text(sdata),
             ElevatedButton(
               onPressed: () {},
               child: const Text('Send Message'),
