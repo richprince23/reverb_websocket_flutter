@@ -1,7 +1,11 @@
+import 'dart:developer';
+
 import 'package:pusher_client_socket/pusher_client_socket.dart';
 
 class ReverbService {
-  late final pusherClient;
+  late final PusherClient pusherClient;
+  // late final Channel channelName;
+
   final options = const PusherOptions(
     key: 'qbobmadn1ajewww7v5yi',
     host: 'localhost', // REVERB_HOST
@@ -17,10 +21,12 @@ class ReverbService {
 
   Future<void> initChannel() async {
     pusherClient = PusherClient(options: options);
-    pusherClient.onConnectionEstablished((data) {
-      print("Connection established - socket-id: ${pusherClient.socketId}");
-      print("Connection established - data: $data");
-    });
+    // pusherClient.onConnectionEstablished((data) {
+    //   print("Connection established - socket-id: ${pusherClient.socketId}");
+    //   print("Connection established - data: $data");
+    //   // channelName = pusherClient.channel("test-channel");
+    //   // channelName.subscribe();
+    // });
     pusherClient.onConnectionError((error) {
       print("Connection error - $error");
     });
@@ -30,6 +36,9 @@ class ReverbService {
     pusherClient.onDisconnected((data) {
       print("Disconnected - $data");
     });
+  }
+
+  void connect() async {
     pusherClient.connect();
   }
 }
