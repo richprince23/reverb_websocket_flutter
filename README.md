@@ -1,3 +1,2 @@
 # reverb_websocket_flutter
-
-A new Flutter project.
+A simple Flutter project to implement laravel Reverb WebSocket in Flutter.
